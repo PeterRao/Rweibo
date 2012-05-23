@@ -2,8 +2,8 @@
 # 首先还是微博登录的函数：
 f_weibo_login <- function(name="****", pwd="****"){
 memory.limit(4000)
-library(RCurl)
-library(digest)
+require(RCurl)
+require(digest)
 
 # 对ID的预处理
 name <- gsub('@', '%40', name)
@@ -82,7 +82,7 @@ return(cH)
 # 然后是抓取数据的函数。目前只写了feeds部分的抓取，其他是类似的，而且会更简单一点，不需要刷新页面。
 f_weibo_get <- function(cH=ch0, N=200, hisnick='chenyibo'){
 # 参数N是想要获取的微博条数。参数hisnick是对方的ID
-library(rjson)
+require(rjson)
 memory.limit(4000)
 
 # 先看一下有多少页
@@ -186,7 +186,7 @@ file.remove("a3.txt")
 file.remove("temp.txt")
 
 # 去掉英文和数字，去掉@对象
-weibo_data <- gsub('__@.*__', '', weibo_data)
+weibo_data <- gsub(' @[^ ]* ', '', weibo_data)
 weibo_data <- gsub('[0-9a-zA-Z]+', '', weibo_data)
 
 return(weibo_data[1:min(as.numeric(number), N)])
@@ -198,11 +198,12 @@ return(weibo_data[1:min(as.numeric(number), N)])
 
 # 亮哥指导我可以用个人词频与公共词频做比较，来筛选关键词。所以我又做了生成词云的函数。
 f_weibo_wordcloud <- function(weibo_data=weibo_10000_0, hisnick='chenyibo'){
+require(wordcloud)
 
 # 分词
-library(rsmartcn)
+require(rmmseg4j)
 f_cut <- function(x){
-unlist(strsplit(smartcn(x), ' '))
+unlist(strsplit(mmseg4j(x), ' '))
 }
 words <- unlist(mapply(f_cut, weibo_data))
 words <- words[words != 'na']
@@ -245,8 +246,7 @@ words_df5 <- rbind(words_df4, words_df3[, 1:2])
 # words_names <- names(words_freq)
 
 # 做词云（这个包貌似对中文支持不是很好）
-library(wordcloud)
-png(paste('weibo_wordcloud_', hisnick, '.png', sep=''),width=500,height=500)
+png(paste('weibo_wordcloud_', Sys.Date(), '_', hisnick, '.png', sep=''),width=500,height=500)
 par(mar=c(0,0,0,0))
 wordcloud(words_df5$words_names, words_df5$words_freq, min.freq=2, 
 scale=c(9,1), max.words=50, random.order=F, colors=terrain.colors(50,1))
