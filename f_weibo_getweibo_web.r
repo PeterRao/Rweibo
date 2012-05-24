@@ -249,7 +249,7 @@ words_df5 <- rbind(words_df4, words_df3[, 1:2])
 png(paste('weibo_wordcloud_', Sys.Date(), '_', hisnick, '.png', sep=''),width=500,height=500)
 par(mar=c(0,0,0,0))
 wordcloud(words_df5$words_names, words_df5$words_freq, min.freq=2, 
-scale=c(9,1), max.words=50, random.order=F, colors=terrain.colors(50,1))
+scale=c(8,1), max.words=50, random.order=F, colors=terrain.colors(50,1))
 dev.off()
 }
 
