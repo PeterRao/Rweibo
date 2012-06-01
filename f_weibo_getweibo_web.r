@@ -221,30 +221,29 @@ SogouLabDic <- read.table('SogouLabDic.dic', fill=T, head=F)
 words_df <- data.frame(words_names=words_names, words_freq=words_freq, words_length=words_length)
 # 只做两三个字的词，简单一点。。。
 words_df <- words_df[words_df$words_length %in% c(2,3), ]
-words_df[, 1] <- as.character(words_df[, 1])
 names(SogouLabDic)[1] <- 'words_names'
 SogouLabDic <- SogouLabDic[SogouLabDic[,1] %in% words_df$words_names, ]
 
 words_df2 <- merge (words_df, SogouLabDic, by='words_names', all.x=T)
-# words_df2 <- words_df2[grep('^[NV],',words_df2$V3), ]
 # 可以筛选名词和动词。不过似乎没有必要，因为形容词副词什么的也能够体现用词风格嘛
-words_df2 <- words_df2[order(-words_df2[,2]), ]
-words_df2$V2[is.na(words_df2$V2)] <- mean(SogouLabDic$V2)
-words_df2$words_freq2 <- words_df2$words_freq/words_df2$V2
-words_df3 <- words_df2[words_df2$words_freq2 > median(words_df2$words_freq2), c('words_names', 'words_freq2')]
+words_df2 <- words_df2[grep('^[NV],$',words_df2$V3), ]
+
+# 匹配不到的扔掉
+words_df3 <- words_df2[!is.na(words_df2$V2), ]
+words_df3$words_freq2 <- words_df3$words_freq * log(max(words_df3$V2)/words_df3$V2)
 
 words_df3 <- words_df3[order(-words_df3$words_freq2), ][1:50, ]
-words_df3$words_rank <- ceiling(rank(words_df3$words_freq2))
-words_df3$words_rank <- ceiling(words_df3$words_rank*50/max(words_df3$words_rank))
+# words_df3$words_rank <- ceiling(rank(words_df3$words_freq2))
+# words_df3$words_rank <- ceiling(words_df3$words_rank*50/max(words_df3$words_rank))
 
 # 做词云（这个包貌似对中文支持不是很好）
 png(paste('weibo_wordcloud_', Sys.Date(), '_', hisnick, '.png', sep=''),width=500,height=500)
 par(mar=c(0,0,0,0))
-wordcloud(words_df3$words_names, words_df3$words_rank, 
-scale=c(4,1), max.words=50, random.order=F, colors=terrain.colors(50,1))
+wordcloud(words_df3$words_names, words_df3$words_freq2, 
+scale=c(6+(max(words_df3$words_freq2)/min(words_df3$words_freq2)-3.8)*0.65,1), 
+max.words=50, random.order=F, colors=terrain.colors(50,1))
 dev.off()
 }
-
 
 
 
