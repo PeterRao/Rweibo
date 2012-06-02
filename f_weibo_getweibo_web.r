@@ -239,7 +239,7 @@ words_df3 <- words_df3[order(-words_df3$words_freq2), ][1:50, ]
 # 做词云（这个包貌似对中文支持不是很好）
 png(paste('weibo_wordcloud_', Sys.Date(), '_', hisnick, '.png', sep=''),width=500,height=500)
 par(mar=c(0,0,0,0))
-wordcloud(words_df3$words_names, words_df3$words_freq2, 
+wordcloud(words_df3$words_names, words_df3$words_freq2, min.freq=0,
 scale=c(6+(max(words_df3$words_freq2)/min(words_df3$words_freq2)-3.8)*0.65,1), 
 max.words=50, random.order=F, colors=terrain.colors(50,1))
 dev.off()
